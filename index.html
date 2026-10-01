@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANALOG_STATION_DECAY</title>
+    <style>
+        @import url('https://googleapis.com');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: #060000;
+            min-height: 100vh;
+        }
+
+        body {
+            color: #d62222; 
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            padding: 40px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        h1 {
+            color: #ff1111;
+            text-align: center;
+            font-size: 3.5rem;
+            letter-spacing: 5px;
+            text-shadow: 0 0 15px #ff0000;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 3px double #ff1111;
+            padding-bottom: 10px;
+        }
+
+        .terminal-meta {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #661111;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        /* --- СИМВОЛЬНЫЕ ГЛАЗА В ТЕМНОТЕ --- */
+        .ancient-eye {
+            position: absolute;
+            font-size: 2.5rem;
+            line-height: 1;
+            color: #440505;
+            text-shadow: 0 0 4px #220000;
+            z-index: 1;
+        }
+        .eye-pos-1 { top: 120px; left: 5%; }
+        .eye-pos-2 { top: 150px; right: 8%; }
+        .eye-pos-3 { top: 45%; left: 47%; font-size: 3rem; color: #550707; } 
+        .eye-pos-4 { bottom: 180px; left: 8%; }
+        .eye-pos-5 { bottom: 140px; right: 5%; }
+
+        /* --- РОДНАЯ СЕТКА GRID ИЗ ВЕРСИИ 15:31 --- */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .block {
+            background: #0f0101;
+            border: 3px solid #551111;
+            padding: 25px;
+            box-shadow: inset 0 0 20px #000, 0 0 15px rgba(255, 0, 0, 0.1);
+            min-height: 380px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .block-left {
+            border-top-left-radius: 20px;
+        }
+
+        .block-right {
+            border-bottom-right-radius: 20px;
+            border-color: #661111;
+        }
+
+        .block-header {
+            font-size: 1.6rem;
+            color: #ff3333;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .decor-line {
+            color: #441111;
+            margin: 10px 0;
+            font-size: 1rem;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            background: #000000;
+            border: 2px solid #441111;
+            color: #ff2222;
+            font-family: 'VT323', monospace;
+            font-size: 1.6rem;
+            box-sizing: border-box;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        input:focus {
+            border-color: #ff1111;
+            background: #110202;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .terminal-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #1a0404;
+            color: #d62222;
+            border: 2px solid #551111;
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .terminal-btn:hover {
+            background-color: #ff1111;
+            color: #000000;
+            font-weight: bold;
+            box-shadow: 0 0 20px #ff0000;
+        }
+
+        .status-feed {
+            margin-top: 15px;
+            font-size: 1.3rem;
+            min-height: 50px;
+            border-left: 3px solid #330000;
+            padding-left: 10px;
+        }
+
+        .redirect-btn-one {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #000;
+            color: #ff3333;
+            border: 1px dashed #ff3333;
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            text-decoration: none;
+            text-align: center;
+            text-transform: uppercase;
+            cursor: pointer;
+            width: 100%;
+        }
+        .redirect-btn-one:hover {
+            background-color: #3a0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .bottom-trigger-zone {
+            text-align: center;
+            margin-top: 50px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        #both-correct-btn {
+            display: none;
+            margin: 0 auto;
+            padding: 25px 50px;
+            background-color: #2b0303;
+            color: #ff1111;
+            border: 4px double #ff1111;
+            font-family: 'VT323', monospace;
+            font-size: 2.6rem;
+            cursor: pointer;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+            text-transform: uppercase;
+        }
+
+        #both-correct-btn:hover {
+            background-color: #ff0000;
+            color: #000000;
+            box-shadow: 0 0 65px #ff0000;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- СИМВОЛЬНЫЕ ГЛАЗА -->
+    <div class="ancient-eye eye-pos-1">(&bull;_&bull;)</div>
+    <div class="ancient-eye eye-pos-2">[&#10094;&#9673;&#10095;]</div>
+    <div class="ancient-eye eye-pos-3">&#12300;&#9786;&#12301;</div>
+    <div class="ancient-eye eye-pos-4">(&deg;_&deg;)</div>
+    <div class="ancient-eye eye-pos-5">[&#9679;_&#9679;]</div>
+
+    <h1>"OBSERVATION" CAMP</h1>
+    <div class="terminal-meta">THEY ARE FIND YOU</div>
+
+    <div class="workspace">
+        <!-- ЛЕВЫЙ БЛОК -->
+        <div class="block block-left">
+            <div class="block-header">>//KEY</div>
+            <div class="decor-line">==================================</div>
+            <input type="text" id="code-input" placeholder="ВВОД КЛЮЧА ДОСТУПА">
+            <button class="terminal-btn" onclick="checkCode()">узнать секреты</button>
+            <div id="code-result" class="status-feed">СТАТУС: ОЖИДАНИЕ СИГНАЛА...</div>
+            <button id="page1-btn" class="redirect-btn-one" onclick="goToPage('page2.html')">ЗАПУСТИТЬ ####### (СТР. 1)</button>
+        </div> 
+
+        <!-- ПРАВЫЙ БЛОК -->
+        <div class="block block-right">
+            <div class="block-header">>//WORD</div>
+            <div class="decor-line">----------------------------------</div>
+            <input type="text" id="password-input" placeholder="ВВОД ФРАЗЫ">
+            <button class="terminal-btn" onclick="checkPassword()">ВВОД</button>
+            <div id="password-result" class="status-feed">СТАТУС: ОЖИДАНИЕ КОМАНДЫ...</div>
+        </div>
+    </div> 
+
+    <div class="bottom-trigger-zone">
+        <button id="both-correct-btn" onclick="goToPage('page3.html')">== Активировать ==</button>
+    </div>
+
+    <script>
+        const CORRECT_CODE = "467588839343123"; 
+
+        let isCodeCorrect = false;
+        let isPasswordCorrect = false;
+
+        function checkCode() {
+            const val = document.getElementById('code-input').value.trim();
+            const res = document.getElementById('code-result');
+            const page1Btn = document.getElementById('page1-btn');
+
+            if (val === CORRECT_CODE) {
+                res.innerText = "> ##########";
+                res.style.color = "#00ff33"; 
+                res.style.borderLeftColor = "#00ff33";
+                isCodeCorrect = true;
+                page1Btn.style.display = "block"; 
+            } else {
+                res.innerText = "> ISEEYOU";
+                res.style.color = "#ff1111";
+                res.style.borderLeftColor = "#ff1111";
+                isCodeCorrect = false;
+                page1Btn.style.display = "none";
+            }
+            toggleBigButton();
+        }
+
+        function checkPassword() {
+            const val = document.getElementById('password-input').value.trim();
+            const res = document.getElementById('password-result');
+            const cleaned = val.toLowerCase().replace(/\s+/g, '');
+
+            if (cleaned === "eyes'sforest" || cleaned === "eyessforest") {
+                res.innerText = "> :)";
+                res.style.color = "#00ff33";
+                res.style.borderLeftColor = "#00ff33";
+                isPasswordCorrect = true;
+            } else {
+                res.innerText = "> It's your reality";
+                res.style.color = "#ff1111";
+                res.style.borderLeftColor = "#ff1111";
+                isPasswordCorrect = false;
+            }
+            toggleBigButton();
+        }
+
+        function toggleBigButton() {
+            const bigBtn = document.getElementById('both-correct-btn');
+            if (isCodeCorrect && isPasswordCorrect) {
+                bigBtn.style.display = "block";
+            } else {
+                bigBtn.style.display = "none";
+            }
+        }
+
+        function goToPage(url) {
+            window.location.href = url;
+        }
+    </script>
+</body>
+</html>
